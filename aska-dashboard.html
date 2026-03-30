@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aska — Priority Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F7F5F0;
+  --surface: #FFFFFF;
+  --surface2: #F0EDE6;
+  --border: rgba(0,0,0,0.08);
+  --border-md: rgba(0,0,0,0.14);
+  --text: #1A1814;
+  --text-2: #6B6560;
+  --text-3: #A09890;
+  --future-bg: #E4F2E8;
+  --future-text: #1A6332;
+  --past-bg: #FAE8E4;
+  --past-text: #8B2B1A;
+  --neutral-bg: #EEEAE3;
+  --neutral-text: #5A5550;
+  --overdue: #C0392B;
+  --soon: #8B5E0A;
+  --accent: #2D2926;
+  --radius: 6px;
+  --radius-lg: 12px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Mono', monospace;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding: 0;
+}
+
+header {
+  padding: 2rem 2.5rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  background: var(--surface);
+}
+
+.logo {
+  font-family: 'Fraunces', serif;
+  font-weight: 300;
+  font-size: 1.5rem;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+.logo span {
+  font-style: italic;
+  color: var(--text-2);
+}
+
+.date-display {
+  font-size: 11px;
+  color: var(--text-3);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  min-height: calc(100vh - 73px);
+}
+
+nav {
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: 1.5rem 0;
+  position: sticky;
+  top: 0;
+  height: calc(100vh - 73px);
+  overflow-y: auto;
+}
+
+.nav-label {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  padding: 0 1.5rem;
+  margin-bottom: 0.5rem;
+  margin-top: 1.25rem;
+}
+
+.nav-label:first-child { margin-top: 0; }
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 1.5rem;
+  font-size: 13px;
+  color: var(--text-2);
+  cursor: pointer;
+  border-left: 2px solid transparent;
+  transition: all 0.1s;
+}
+
+.nav-item:hover { background: var(--surface2); color: var(--text); }
+
+.nav-item.active {
+  color: var(--text);
+  border-left-color: var(--text);
+  background: var(--surface2);
+  font-weight: 500;
+}
+
+.nav-count {
+  font-size: 11px;
+  color: var(--text-3);
+  background: var(--surface2);
+  padding: 1px 7px;
+  border-radius: 99px;
+}
+
+.nav-item.active .nav-count {
+  background: var(--border-md);
+}
+
+main {
+  padding: 2rem 2.5rem;
+  max-width: 860px;
+}
+
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 2rem;
+}
+
+.stat {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1rem 1.25rem;
+}
+
+.stat-label {
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  margin-bottom: 6px;
+}
+
+.stat-val {
+  font-family: 'Fraunces', serif;
+  font-weight: 300;
+  font-size: 1.75rem;
+  color: var(--text);
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.stat-sub {
+  font-size: 11px;
+  color: var(--text-3);
+  margin-top: 4px;
+}
+
+.top-focus {
+  background: var(--accent);
+  color: #F7F5F0;
+  border-radius: var(--radius-lg);
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.focus-eyebrow {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.5;
+  margin-bottom: 4px;
+}
+
+.focus-text {
+  font-family: 'Fraunces', serif;
+  font-weight: 300;
+  font-size: 1.1rem;
+  font-style: italic;
+  flex: 1;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.section-title {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+
+.add-form {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.add-form input[type=text] {
+  flex: 2;
+  min-width: 180px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 7px 12px;
+  font-family: 'DM Mono', monospace;
+  font-size: 13px;
+  color: var(--text);
+  outline: none;
+}
+
+.add-form input[type=text]:focus { border-color: var(--border-md); }
+
+.add-form input[type=date] {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 7px 10px;
+  font-family: 'DM Mono', monospace;
+  font-size: 13px;
+  color: var(--text);
+  outline: none;
+}
+
+.add-form select {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 7px 10px;
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  color: var(--text);
+  outline: none;
+  cursor: pointer;
+}
+
+.btn-add {
+  background: var(--accent);
+  color: #F7F5F0;
+  border: none;
+  border-radius: var(--radius);
+  padding: 7px 16px;
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  transition: opacity 0.15s;
+}
+
+.btn-add:hover { opacity: 0.85; }
+
+.task-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 2rem; }
+
+.task {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: border-color 0.15s;
+}
+
+.task:hover { border-color: var(--border-md); }
+.task.done { opacity: 0.38; }
+.task.done .task-text { text-decoration: line-through; }
+.task.overdue { border-left: 3px solid var(--overdue); }
+
+.check {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border-md);
+  cursor: pointer;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  transition: all 0.15s;
+}
+
+.check:hover { border-color: var(--text-2); }
+.check.checked { background: var(--future-bg); border-color: var(--future-text); color: var(--future-text); }
+
+.task-text { flex: 1; font-size: 13px; color: var(--text); line-height: 1.4; }
+
+.due-badge {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 99px;
+  flex-shrink: 0;
+  letter-spacing: 0.02em;
+}
+
+.due-badge.overdue { background: var(--past-bg); color: var(--overdue); }
+.due-badge.soon { background: #FDF3E0; color: var(--soon); }
+.due-badge.normal { background: var(--neutral-bg); color: var(--neutral-text); }
+
+.signal-badge {
+  font-size: 10px;
+  padding: 2px 9px;
+  border-radius: 99px;
+  flex-shrink: 0;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.signal-badge.future { background: var(--future-bg); color: var(--future-text); }
+.signal-badge.past { background: var(--past-bg); color: var(--past-text); }
+.signal-badge.neutral { background: var(--neutral-bg); color: var(--neutral-text); }
+
+.task-actions { display: flex; gap: 4px; flex-shrink: 0; }
+
+.btn-cal {
+  font-size: 11px;
+  padding: 3px 9px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border-md);
+  background: transparent;
+  color: var(--text-2);
+  cursor: pointer;
+  font-family: 'DM Mono', monospace;
+  transition: all 0.1s;
+  letter-spacing: 0.02em;
+}
+
+.btn-cal:hover { background: var(--surface2); color: var(--text); }
+
+.btn-del {
+  font-size: 14px;
+  padding: 2px 6px;
+  border-radius: var(--radius);
+  border: none;
+  background: transparent;
+  color: var(--text-3);
+  cursor: pointer;
+  transition: color 0.1s;
+  line-height: 1;
+}
+
+.btn-del:hover { color: var(--overdue); }
+
+.empty {
+  font-size: 13px;
+  color: var(--text-3);
+  padding: 1.5rem 0;
+  text-align: center;
+  font-style: italic;
+}
+
+.divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 1.5rem 0;
+}
+
+.past-watch {
+  background: var(--past-bg);
+  border: 1px solid rgba(139,43,26,0.12);
+  border-radius: var(--radius-lg);
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.past-watch-header {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--past-text);
+  margin-bottom: 0.75rem;
+  opacity: 0.8;
+}
+
+@media (max-width: 680px) {
+  .layout { grid-template-columns: 1fr; }
+  nav { height: auto; position: static; border-right: none; border-bottom: 1px solid var(--border); padding: 1rem 0; display: flex; flex-wrap: wrap; gap: 0; }
+  .nav-label { display: none; }
+  .nav-item { border-left: none; border-bottom: 2px solid transparent; padding: 0.5rem 1rem; font-size: 12px; }
+  .nav-item.active { border-bottom-color: var(--text); border-left: none; }
+  header { padding: 1.25rem 1.5rem; }
+  main { padding: 1.25rem 1.5rem; }
+  .stats-row { grid-template-columns: 1fr 1fr; }
+  .add-form { flex-direction: column; }
+  .add-form input, .add-form select, .btn-add { width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">aska <span>/ priorities</span></div>
+  <div class="date-display" id="date-display"></div>
+</header>
+
+<div class="layout">
+  <nav>
+    <div class="nav-label">Ventures</div>
+    <div class="nav-item active" data-v="all" onclick="setVenture('all')">All <span class="nav-count" id="count-all">0</span></div>
+    <div class="nav-item" data-v="anosa" onclick="setVenture('anosa')">anosa.ai <span class="nav-count" id="count-anosa">0</span></div>
+    <div class="nav-item" data-v="gidw" onclick="setVenture('gidw')">GetItDoneWith.AI <span class="nav-count" id="count-gidw">0</span></div>
+    <div class="nav-label">Other</div>
+    <div class="nav-item" data-v="personal" onclick="setVenture('personal')">Personal <span class="nav-count" id="count-personal">0</span></div>
+  </nav>
+
+  <main>
+    <div class="stats-row">
+      <div class="stat">
+        <div class="stat-label">Top focus</div>
+        <div class="stat-val" id="stat-top" style="font-size:1rem; font-family:'DM Mono',monospace; font-weight:400; padding-top:4px;">—</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Future-Aska %</div>
+        <div class="stat-val" id="stat-pct">—</div>
+        <div class="stat-sub" id="stat-pct-sub"></div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Due this week</div>
+        <div class="stat-val" id="stat-due">0</div>
+        <div class="stat-sub" id="stat-overdue-sub"></div>
+      </div>
+    </div>
+
+    <div class="section-header">
+      <div class="section-title">This week's tasks</div>
+    </div>
+
+    <div class="add-form">
+      <input type="text" id="task-input" placeholder="Add a task..." />
+      <input type="date" id="due-input" />
+      <select id="signal-sel">
+        <option value="future">Future-Aska</option>
+        <option value="neutral">Neutral</option>
+        <option value="past">Past pattern</option>
+      </select>
+      <select id="venture-sel">
+        <option value="anosa">anosa.ai</option>
+        <option value="gidw">GetItDoneWith.AI</option>
+        <option value="personal">Personal</option>
+      </select>
+      <button class="btn-add" onclick="addTask()">+ Add</button>
+    </div>
+
+    <div class="task-list" id="task-list"></div>
+
+    <div class="divider"></div>
+
+    <div class="past-watch">
+      <div class="past-watch-header">Past-pattern watch — question these</div>
+      <div id="past-list"></div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+const STORAGE_KEY = 'aska_tasks_v1';
+let venture = 'all';
+const today = new Date(); today.setHours(0,0,0,0);
+
+document.getElementById('date-display').textContent = today.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }).toUpperCase();
+
+function load() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || defaultTasks(); }
+  catch(e) { return defaultTasks(); }
+}
+
+function save(tasks) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+}
+
+function defaultTasks() {
+  return [
+    { id: 1, text: 'Finalize bio for SusHi Tech', venture: 'gidw', signal: 'future', done: false, due: '' },
+    { id: 2, text: 'anosa.ai prototype review', venture: 'anosa', signal: 'future', done: false, due: '' },
+    { id: 3, text: 'GetItDoneWith.AI website positioning', venture: 'gidw', signal: 'future', done: false, due: '' },
+    { id: 4, text: 'NTT Data documentation (time-boxed)', venture: 'gidw', signal: 'neutral', done: false, due: '' },
+  ];
+}
+
+let tasks = load();
+let nextId = tasks.length ? Math.max(...tasks.map(t => t.id)) + 1 : 1;
+
+function daysFromNow(dateStr) {
+  if (!dateStr) return null;
+  const d = new Date(dateStr); d.setHours(0,0,0,0);
+  return Math.round((d - today) / 86400000);
+}
+
+function dueLabel(dateStr) {
+  const d = daysFromNow(dateStr);
+  if (d === null) return null;
+  if (d < 0) return { text: 'Overdue', cls: 'overdue' };
+  if (d === 0) return { text: 'Today', cls: 'soon' };
+  if (d === 1) return { text: 'Tomorrow', cls: 'soon' };
+  if (d <= 7) return { text: 'In ' + d + 'd', cls: 'normal' };
+  return { text: new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }), cls: 'normal' };
+}
+
+function setVenture(v) {
+  venture = v;
+  document.querySelectorAll('.nav-item').forEach(el => {
+    el.classList.toggle('active', el.dataset.v === v);
+  });
+  render();
+}
+
+function addTask() {
+  const text = document.getElementById('task-input').value.trim();
+  if (!text) return;
+  tasks.push({
+    id: nextId++,
+    text,
+    venture: document.getElementById('venture-sel').value,
+    signal: document.getElementById('signal-sel').value,
+    due: document.getElementById('due-input').value,
+    done: false
+  });
+  document.getElementById('task-input').value = '';
+  document.getElementById('due-input').value = '';
+  save(tasks);
+  render();
+}
+
+document.getElementById('task-input').addEventListener('keydown', e => { if (e.key === 'Enter') addTask(); });
+
+function toggleTask(id) {
+  const t = tasks.find(t => t.id === id);
+  if (t) { t.done = !t.done; save(tasks); render(); }
+}
+
+function deleteTask(id) {
+  if (!confirm('Remove this task?')) return;
+  tasks = tasks.filter(t => t.id !== id);
+  save(tasks);
+  render();
+}
+
+function sortTasks(list) {
+  const sigOrder = { future: 0, neutral: 1 };
+  return list.slice().sort((a, b) => {
+    if (a.done !== b.done) return a.done ? 1 : -1;
+    const sa = sigOrder[a.signal] ?? 2, sb = sigOrder[b.signal] ?? 2;
+    if (sa !== sb) return sa - sb;
+    const da = a.due ? daysFromNow(a.due) ?? 999 : 999;
+    const db = b.due ? daysFromNow(b.due) ?? 999 : 999;
+    return da - db;
+  });
+}
+
+function signalLabel(s) {
+  if (s === 'future') return 'Future';
+  if (s === 'past') return 'Past';
+  return 'Neutral';
+}
+
+function taskHTML(t) {
+  const dl = t.due ? dueLabel(t.due) : null;
+  const isOverdue = dl && dl.cls === 'overdue';
+  return `<div class="task ${t.done ? 'done' : ''} ${isOverdue ? 'overdue' : ''}">
+    <div class="check ${t.done ? 'checked' : ''}" onclick="toggleTask(${t.id})">${t.done ? '✓' : ''}</div>
+    <span class="task-text">${t.text}</span>
+    ${dl ? `<span class="due-badge ${dl.cls}">${dl.text}</span>` : ''}
+    <span class="signal-badge ${t.signal}">${signalLabel(t.signal)}</span>
+    <div class="task-actions">
+      <button class="btn-del" onclick="deleteTask(${t.id})">×</button>
+    </div>
+  </div>`;
+}
+
+function updateCounts(all) {
+  const ventures = ['all', 'anosa', 'gidw', 'personal'];
+  ventures.forEach(v => {
+    const filtered = v === 'all' ? all : all.filter(t => t.venture === v);
+    const active = filtered.filter(t => !t.done && t.signal !== 'past').length;
+    const el = document.getElementById('count-' + v);
+    if (el) el.textContent = active || '';
+  });
+}
+
+function render() {
+  const filtered = venture === 'all' ? tasks : tasks.filter(t => t.venture === venture);
+  const active = filtered.filter(t => t.signal !== 'past');
+  const past = filtered.filter(t => t.signal === 'past');
+
+  updateCounts(tasks);
+
+  const futureTasks = sortTasks(active.filter(t => t.signal === 'future' && !t.done));
+  document.getElementById('stat-top').textContent = futureTasks.length > 0 ? futureTasks[0].text : '—';
+
+  const total = active.filter(t => !t.done).length;
+  const futureCount = active.filter(t => t.signal === 'future' && !t.done).length;
+  const pctEl = document.getElementById('stat-pct');
+  const pctSub = document.getElementById('stat-pct-sub');
+  if (total > 0) {
+    pctEl.textContent = Math.round((futureCount / total) * 100) + '%';
+    pctSub.textContent = futureCount + ' of ' + total + ' tasks';
+  } else {
+    pctEl.textContent = '—';
+    pctSub.textContent = '';
+  }
+
+  const dueThisWeek = active.filter(t => {
+    const d = daysFromNow(t.due);
+    return d !== null && d <= 7 && !t.done;
+  }).length;
+  const overdue = active.filter(t => {
+    const d = daysFromNow(t.due);
+    return d !== null && d < 0 && !t.done;
+  }).length;
+  document.getElementById('stat-due').textContent = dueThisWeek;
+  document.getElementById('stat-overdue-sub').textContent = overdue > 0 ? overdue + ' overdue' : '';
+  document.getElementById('stat-overdue-sub').style.color = overdue > 0 ? 'var(--overdue)' : '';
+
+  const list = document.getElementById('task-list');
+  list.innerHTML = active.length === 0
+    ? '<div class="empty">No tasks — add one above.</div>'
+    : sortTasks(active).map(taskHTML).join('');
+
+  const pastList = document.getElementById('past-list');
+  pastList.innerHTML = past.length === 0
+    ? '<div class="empty" style="text-align:left; padding: 0.25rem 0;">None flagged — good.</div>'
+    : '<div class="task-list">' + past.map(taskHTML).join('') + '</div>';
+}
+
+render();
+</script>
+</body>
+</html>
